@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+          integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+<!--    <link rel="stylesheet" th:href="@{/css/home.css}">-->
+</head>
+<body>
+<div class="login-container">
+    <h1>Login</h1>
+    <form th:action="@{/login}" method="post">
+        <input type="email" class="form-control" id="email" name="username" placeholder="Email Address" required>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+        <button type="submit" class="form-control btn btn-dark">Continue</button>
+    </form>
+    <p th:if="${param.error}" style="color: red;">Invalid username or password.</p>
+    <p th:if="${param.logout}" style="color: green;">You have been logged out successfully.</p>
+    <p>or</p>
+    <a th:href="@{/oauth2/authorization/google}" class="btn btn-danger"><i class="fa-brands fa-google"></i> Continue with Google</a>
+    <a th:href="@{/register}" class="btn btn-dark">Register</a>
+</div>
+</body>
+<style>
+    body, html {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f4f4f4;
+    }
+    .login-container {
+        width: 100%;
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    .form-control {
+        margin-top: 5px;
+    }
+</style>
+</html>
