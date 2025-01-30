@@ -9,6 +9,7 @@ import com.GoalLineNews.repository.NewsRepository;
 import com.GoalLineNews.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -28,6 +29,8 @@ public class CommentService {
     private UserRepository userRepository;
     @Autowired
     private NewsRepository newsRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -56,15 +59,41 @@ public class CommentService {
         return formattedComments;
     }
 
+    public Object[] findLatestCommentByNewsId(int newsId) {
+        List<Object[]> comments = findCommentsByNewsIdWithUserName(newsId);
+
+        if (!comments.isEmpty()) {
+            return comments.get(0);
+        }
+
+        return null;
+    }
+
+
     public CommentDTO getCommentById(int id) {
         Optional<Comment> commentOptional = commentRepository.findById(id);
         return commentOptional.map(this::convertEntityToDTO).orElse(null);
     }
 
-    public CommentDTO createComment(CommentDTO commentDTO) {
+    public Object[] createComment(CommentDTO commentDTO) {
         Comment savedComment = convertDTOToEntity(commentDTO);
         commentRepository.save(savedComment);
-        return convertEntityToDTO(savedComment);
+
+        int id = (int) savedComment.getId();
+        String text = (String) savedComment.getText();
+        String userName = (String) savedComment.getUser().getName();
+
+        int likes = commentRepository.findCommentsLikeByCommentId(id);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        // Tính thời gian đã trôi qua và định dạng
+        Duration duration = Duration.between(((LocalDateTime) savedComment.getTime()), now);
+        String formattedTime = formatTimeElapsed(duration);
+
+        // Thêm comment đã định dạng lại vào danh sách kết quả
+        Object[] newComment = new Object[]{id, text, userName, formattedTime, likes};
+        return newComment;
     }
 
     public CommentDTO updateComment(int id, CommentDTO commentDTO) {

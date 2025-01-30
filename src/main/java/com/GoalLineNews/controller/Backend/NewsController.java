@@ -1,6 +1,7 @@
 package com.GoalLineNews.controller.Backend;
 
 import com.GoalLineNews.GoalLineNewsManagementApplication;
+import com.GoalLineNews.auth.UnifiedUserDetails;
 import com.GoalLineNews.dto.CommentDTO;
 import com.GoalLineNews.dto.NewsDTO;
 import com.GoalLineNews.dto.TagDTO;
@@ -15,6 +16,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -65,7 +69,14 @@ public class NewsController {
     }
 
     @GetMapping("/show/{id}")
-    public String show(@PathVariable("id") int id, Model model) {
+    public String show(@AuthenticationPrincipal UnifiedUserDetails userDetails, @PathVariable("id") int id, Model model) {
+        //check if user login or not
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() &&
+                !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"))) {
+            model.addAttribute("user_id", userDetails.getDatabaseId());
+        }
+
         NewsDTO news = newsService.getNewsById(id);
         newsService.updateViewNews(id, news);
 
@@ -93,7 +104,7 @@ public class NewsController {
         String thumbsPath = saveThumbsImage(file);
         newsDTO.setImage(thumbsPath);
         newsService.createNews(newsDTO, authorIdList);
-        return "redirect:" + referer  + "?success";
+        return "redirect:" + referer + "?success";
     }
 
     @GetMapping("/edit/{id}")
@@ -103,7 +114,7 @@ public class NewsController {
         List<Integer> authorIds = authorsList.stream()
                 .map(UserDTO::getId)
                 .collect(Collectors.toList());
-        
+
         List<UserDTO> writers = userService.getUsersByRole(GoalLineNewsManagementApplication.Role.WRITER);
         List<UserDTO> admins = userService.getUsersByRole(GoalLineNewsManagementApplication.Role.ADMIN);
         List<UserDTO> authors = new ArrayList<>();
@@ -127,7 +138,7 @@ public class NewsController {
     }
 
     @PostMapping("/{id}")
-    public String update(HttpServletRequest request, @PathVariable("id") int id,  @RequestParam("author_id") List<Integer> authorIdList, @RequestParam("tag_id") List<Integer> tagsList, @RequestParam("file") MultipartFile file, NewsDTO newsDTO) {
+    public String update(HttpServletRequest request, @PathVariable("id") int id, @RequestParam("author_id") List<Integer> authorIdList, @RequestParam("tag_id") List<Integer> tagsList, @RequestParam("file") MultipartFile file, NewsDTO newsDTO) {
         String referer = request.getHeader("Referer");
         NewsDTO newsDTOImage = newsService.getNewsById(id);
         String filePath = "src/main/upload/images/" + newsDTOImage.getImage();
@@ -143,7 +154,7 @@ public class NewsController {
         } else {
             return "Failed to delete file";
         }
-        return "redirect:" + referer  + "?success";
+        return "redirect:" + referer + "?success";
     }
 
     @GetMapping("/delete/{id}")
@@ -158,7 +169,7 @@ public class NewsController {
             return "redirect:" + referer + "?error";
         }
         newsService.deleteNews(id);
-        return "redirect:" + referer  + "?success";
+        return "redirect:" + referer + "?success";
     }
 
     private String saveThumbsImage(MultipartFile file) {

@@ -38,7 +38,8 @@ public class SecurityConfig {
                                 "/img/**",
                                 "/lib/**",
                                 "/news/show/**",
-                                "/news/comments/**"
+                                "/news/comments/**",
+                                "/ws-stomp/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
