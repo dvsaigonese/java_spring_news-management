@@ -7,7 +7,7 @@ A web-based news management application built using **Java Spring Boot**. This p
 ### **Level 1 - Essential** 
 _This requirement is critical to the project's success. The project cannot proceed without this feature._
 - **User Authentication**: Supports login and registration.  
-- **Role-based Access Control**:
+- **Discretionary Access Control**:
   - Admin: Manage all news, users.
   - Writers: Create and edit their own articles.
   - Viewers: Read articles.  
@@ -19,6 +19,7 @@ _This requirement is critical to the project's success. The project cannot proce
 - **Google OAuth2**: Login using Google accounts.
 - **User Interaction**:
   - Comment on articles: Readers can add, edit, or delete their comments.
+  - Real-time viewing comments: Users can read comments in real-time with Websocket.
   - Like articles: Users can like their favorite articles.  
 
 ### **Level 2 - Future**
@@ -37,6 +38,7 @@ _This requirement is beyond the scope of this project and has been included here
   - Bootstrap
 - **Other**:
   - CKEditor5 (Rich text editor)
+  - WebSocket (Handling comments in real-time)
 
 ## Project Structure
 
@@ -60,3 +62,16 @@ src/
 ## Database
 
 ![App Screenshot](DB_img.png)
+
+## Project View
+
+### Home  Screen
+
+![App Screenshot](project_img/homeScreen.png)
+### Read Article
+![Article Screenshot](project_img/viewArticle.jpeg)
+### Post new article
+![Article Screenshot](project_img/postSubmission.jpeg)
+### Admin Data Table
+![Article Screenshot](project_img/dashboardDatatable.jpeg)
+
